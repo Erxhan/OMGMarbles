@@ -7,83 +7,74 @@
 //
 
 import SpriteKit
-import GameplayKit
+import CoreMotion
+
+class Ball: SKSpriteNode {}
 
 class GameScene: SKScene {
     
-    private var label : SKLabelNode?
-    private var spinnyNode : SKShapeNode?
+    var balls = ["ballBlue", "ballGreen", "ballPurple", "ballRed", "ballYellow"]
+    
+    var motionManager: CMMotionManager?
+    
+    let scoreLabel = SKLabelNode(fontNamed: "HelveticaNeue-Thin")
+    
+    var score = 0 {
+        didSet {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            let formattedScore = formatter.string(from: score as NSNumber) ?? "0"
+            scoreLabel.text = "SCORE: \(formattedScore)"
+        }
+    }
     
     override func didMove(to view: SKView) {
+        let background = SKSpriteNode(imageNamed: "checkerboard")
+        background.position = CGPoint(x: frame.midX, y: frame.midY)
+        background.alpha = 0.2
+        background.zPosition = -1
+        addChild(background)
+    
+        scoreLabel.fontSize = frame.height / 100 * 6
+        let position = frame.height / 100 * 3
+        print("position: \(position)")
+        scoreLabel.position = CGPoint(x: position, y: position)
+        scoreLabel.text = "SCORE: 0"
+        scoreLabel.zPosition = 100
+        scoreLabel.horizontalAlignmentMode = .left
+        addChild(scoreLabel)
         
-        // Get label node from scene and store it for use later
-        self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
-        if let label = self.label {
-            label.alpha = 0.0
-            label.run(SKAction.fadeIn(withDuration: 2.0))
-        }
         
-        // Create shape node to use during mouse interaction
-        let w = (self.size.width + self.size.height) * 0.05
-        self.spinnyNode = SKShapeNode.init(rectOf: CGSize.init(width: w, height: w), cornerRadius: w * 0.3)
+        let ball = SKSpriteNode(imageNamed: "ballBlue")
+        let ballRadius = ball.frame.width / 2.0
         
-        if let spinnyNode = self.spinnyNode {
-            spinnyNode.lineWidth = 2.5
-            
-            spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
-            spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
-                                              SKAction.fadeOut(withDuration: 0.5),
-                                              SKAction.removeFromParent()]))
-        }
-    }
-    
-    
-    func touchDown(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.green
-            self.addChild(n)
-        }
-    }
-    
-    func touchMoved(toPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.blue
-            self.addChild(n)
-        }
-    }
-    
-    func touchUp(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.red
-            self.addChild(n)
-        }
-    }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let label = self.label {
-            label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
+        for i in stride(from: ballRadius, to: view.bounds.width - ballRadius, by: ball.frame.width) {
+            for j in stride(from: frame.height/10, to: view.bounds.height - ballRadius, by: ball.frame.height) {
+                let ballType = balls.randomElement()!
+                let ball = Ball(imageNamed: ballType)
+                ball.position = CGPoint(x: i, y: j)
+                ball.name = ballType
+                
+                ball.physicsBody = SKPhysicsBody(circleOfRadius: ballRadius)
+                ball.physicsBody?.allowsRotation = false
+                ball.physicsBody?.restitution = 0
+                ball.physicsBody?.friction = 0
+                
+                addChild(ball)
+            }
         }
         
-        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
-    }
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
-    }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-    }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
+        physicsBody = SKPhysicsBody(edgeLoopFrom: frame.inset(by: UIEdgeInsets(top: frame.height/10, left: 0, bottom: 0, right: 0)))
+        
+        motionManager = CMMotionManager()
+        motionManager?.startAccelerometerUpdates()
     }
     
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
+        if let accelerometerData = motionManager?.accelerometerData {
+            physicsWorld.gravity = CGVector(dx: accelerometerData.acceleration.y * -50, dy: accelerometerData.acceleration.x * 50)
+        }
     }
 }
