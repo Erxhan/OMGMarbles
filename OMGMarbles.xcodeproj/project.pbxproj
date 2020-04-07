@@ -15,6 +15,7 @@
 		CBB93ADA243B3F4A00E92F7F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CBB93AD8243B3F4A00E92F7F /* Main.storyboard */; };
 		CBB93ADC243B3F4C00E92F7F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CBB93ADB243B3F4C00E92F7F /* Assets.xcassets */; };
 		CBB93ADF243B3F4C00E92F7F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CBB93ADD243B3F4C00E92F7F /* LaunchScreen.storyboard */; };
+		CBBB6517243CEBBA0075F1CE /* Background.fsh in Resources */ = {isa = PBXBuildFile; fileRef = CBBB6516243CEBBA0075F1CE /* Background.fsh */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		CBB93ADB243B3F4C00E92F7F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CBB93ADE243B3F4C00E92F7F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CBB93AE0243B3F4C00E92F7F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CBBB6516243CEBBA0075F1CE /* Background.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = Background.fsh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,13 +64,14 @@
 			children = (
 				CBB93ACE243B3F4A00E92F7F /* AppDelegate.swift */,
 				CBB93AD0243B3F4A00E92F7F /* GameScene.sks */,
+				CB490011243CB0E200AE698C /* Explosion.sks */,
+				CBBB6516243CEBBA0075F1CE /* Background.fsh */,
 				CBB93AD4243B3F4A00E92F7F /* GameScene.swift */,
 				CBB93AD6243B3F4A00E92F7F /* GameViewController.swift */,
 				CBB93AD8243B3F4A00E92F7F /* Main.storyboard */,
 				CBB93ADB243B3F4C00E92F7F /* Assets.xcassets */,
 				CBB93ADD243B3F4C00E92F7F /* LaunchScreen.storyboard */,
 				CBB93AE0243B3F4C00E92F7F /* Info.plist */,
-				CB490011243CB0E200AE698C /* Explosion.sks */,
 			);
 			path = OMGMarbles;
 			sourceTree = "<group>";
@@ -136,6 +139,7 @@
 				CB490012243CB0E200AE698C /* Explosion.sks in Resources */,
 				CBB93ADC243B3F4C00E92F7F /* Assets.xcassets in Resources */,
 				CBB93ADF243B3F4C00E92F7F /* LaunchScreen.storyboard in Resources */,
+				CBBB6517243CEBBA0075F1CE /* Background.fsh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

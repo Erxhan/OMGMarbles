@@ -66,6 +66,18 @@ class GameScene: SKScene {
             }
         }
         
+        let uniforms: [SKUniform] = [
+            SKUniform(name: "u_speed", float: 1),
+            SKUniform(name: "u_strength", float: 3),
+            SKUniform(name: "u_frequency", float: 20)
+        ]
+
+        let shader = SKShader(fileNamed: "Background")
+        shader.uniforms = uniforms
+        background.shader = shader
+
+        background.run(SKAction.repeatForever(SKAction.rotate(byAngle: .pi, duration: 10)))
+        
         physicsBody = SKPhysicsBody(edgeLoopFrom: frame.inset(by: UIEdgeInsets(top: frame.height/10, left: 0, bottom: 0, right: 0)))
         
         motionManager = CMMotionManager()
@@ -125,7 +137,7 @@ class GameScene: SKScene {
         
         getMatches(from: tappedBall)
         
-        if matchedBalls.count > 3 {
+        if matchedBalls.count >= 3 {
             
             score += Int(pow(2, Double(min(matchedBalls.count, 16))))
             
