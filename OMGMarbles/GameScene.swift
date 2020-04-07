@@ -19,6 +19,8 @@ class GameScene: SKScene {
     
     let scoreLabel = SKLabelNode(fontNamed: "HelveticaNeue-Thin")
     
+    var matchedBalls = Set<Ball>()
+    
     var score = 0 {
         didSet {
             let formatter = NumberFormatter()
@@ -34,7 +36,7 @@ class GameScene: SKScene {
         background.alpha = 0.2
         background.zPosition = -1
         addChild(background)
-    
+        
         scoreLabel.fontSize = frame.height / 100 * 6
         let position = frame.height / 100 * 3
         print("position: \(position)")
@@ -75,6 +77,100 @@ class GameScene: SKScene {
         // Called before each frame is rendered
         if let accelerometerData = motionManager?.accelerometerData {
             physicsWorld.gravity = CGVector(dx: accelerometerData.acceleration.y * -50, dy: accelerometerData.acceleration.x * 50)
+        }
+    }
+    
+    //    func getMatches(from node: Ball) {
+    //        for body in node.physicsBody!.allContactedBodies() {
+    //            guard let ball = body.node as? Ball else { continue }
+    //            guard ball.name == node.name else { continue }
+    //
+    //            if !matchedBalls.contains(ball) {
+    //                matchedBalls.insert(ball)
+    //                getMatches(from: ball)
+    //            }
+    //        }
+    //    }
+    
+    func getMatches(from startBall: Ball) {
+        let matchWidth = startBall.frame.width * startBall.frame.width * 1.1
+        
+        for node in children {
+            guard let ball = node as? Ball else { continue }
+            guard ball.name == startBall.name else { continue }
+            
+            let dist = distance(from: startBall, to: ball)
+            
+            guard dist < matchWidth else { continue }
+            
+            if !matchedBalls.contains(ball) {
+                matchedBalls.insert(ball)
+                getMatches(from: ball)
+            }
+            
+        }
+    }
+    
+    func distance(from: Ball, to: Ball) -> CGFloat {
+        return (from.position.x - to.position.x) * (from.position.x - to.position.x) + (from.position.y - to.position.y) * (from.position.y - to.position.y)
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        
+        guard let position = touches.first?.location(in: self) else { return }
+        guard let tappedBall = nodes(at: position).first(where: {$0 is Ball}) as? Ball else { return }
+        
+        matchedBalls.removeAll(keepingCapacity: true)
+        
+        getMatches(from: tappedBall)
+        
+        if matchedBalls.count > 3 {
+            
+            score += Int(pow(2, Double(min(matchedBalls.count, 16))))
+            
+            for ball in matchedBalls {
+                
+                if let particles = SKEmitterNode(fileNamed: "Explosion") {
+                    particles.position = ball.position
+                    addChild(particles)
+                    
+                    let removeAfterDead = SKAction.sequence([
+                        SKAction.wait(forDuration: 3),
+                        SKAction.removeFromParent()
+                    ])
+                    particles.run(removeAfterDead)
+                }
+                ball.removeFromParent()
+            }
+        }
+        
+        if matchedBalls.count >= 7 {
+            let omg = SKSpriteNode(imageNamed: "omg")
+            omg.position = CGPoint(x: frame.midX, y: frame.midY)
+            omg.zPosition = 100
+            omg.yScale = 0.001
+            omg.xScale = 0.001
+            addChild(omg)
+            
+            let appear = SKAction.group([
+                SKAction.scale(to: 1, duration: 0.25),
+                SKAction.fadeIn(withDuration: 0.25)
+            ])
+            
+            let disappear = SKAction.group([
+                SKAction.scale(to: 2, duration: 0.25),
+                SKAction.fadeOut(withDuration: 0.25)
+            ])
+            
+            let sequence = SKAction.sequence([
+                appear,
+                SKAction.wait(forDuration: 0.25),
+                disappear
+            ])
+            
+            omg.run(sequence)
+        
         }
     }
 }
